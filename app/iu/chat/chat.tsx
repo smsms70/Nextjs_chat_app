@@ -4,16 +4,17 @@ import Image from "next/image";
 import { SendMessageForm } from "./forms";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { useState, useEffect } from "react";
-import { auth } from "@/app/lib/auth";
+import { User } from "firebase/auth";
 
-export default function ChatBox () {
+export default function ChatBox ({user, currentGroup}: {
+  user: User | null;
+  currentGroup: string
+}) {
   const [allMessages, setAllMessages] = useState<any>([]);
-  const [user, setUser] = useState(() => auth.currentUser);
 
   useEffect(() => {
     const db = getDatabase();
-
-    const starCountRef = ref(db, 'messages/');
+    const starCountRef = ref(db, `${currentGroup}/`);
 
     onValue(starCountRef, (snapshot) => {
       const data = snapshot.val();
@@ -23,15 +24,7 @@ export default function ChatBox () {
       }
       setAllMessages(arr)
     });
-
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    });
-  },[]);
+  },[currentGroup]);
 
   return (
     <section className="rounded-3xl h-full w-full flex flex-col overflow-hidden border border-white/50 shadow-xl hover:shadow-white/10 duration-300">
@@ -44,20 +37,24 @@ export default function ChatBox () {
             message={e.text}
             sameUser={arr[index - 1]?.userID === e.userID}
             byThisUser={e.userID === user?.uid}
+            userName={e.name}
             photo={e.photo}
           />)
         )
        }
       </main>
-        <SendMessageForm/>
+        <SendMessageForm
+          currentGroup= {currentGroup}
+        />
     </section>
   )
 }
 
-function Message ({message, byThisUser, sameUser, photo} :{
+function Message ({message, byThisUser, sameUser, userName, photo} :{
   message: string;
   byThisUser: boolean;
   sameUser: boolean;
+  userName: string;
   photo: string;
 }) {
   return (
@@ -81,7 +78,7 @@ function Message ({message, byThisUser, sameUser, photo} :{
           ${byThisUser ? 
             'ml-auto text-purple-800' :
             'mr-auto text-zinc-800'}`
-            }> user name </p> 
+            }>{userName}</p> 
         }
           {/* Body */}
         <p className={ `${byThisUser ? '' : ''}` }>

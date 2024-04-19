@@ -5,7 +5,9 @@ import { useState } from "react";
 import { useFormState } from "react-dom";
 import { createMessage } from "@/app/lib/actions";
 
-export function SendMessageForm () {
+export function SendMessageForm ({currentGroup} :{
+  currentGroup: string;
+}) {
   const [newMessage, setNewMessage] = useState<string>("");
   const initialState = {message: ""}
 
@@ -21,7 +23,16 @@ export function SendMessageForm () {
         value={newMessage}
         className="h-[80%] w-full max-w-[500px] pl-4 bg-black rounded-3xl font-light text-white/90 focus:outline-none"
         placeholder="Send Message..."
+        autoComplete="off"
         onChange={(e) => setNewMessage(e.target.value)}
+      />
+      <input 
+        type="text" 
+        id="currentGroup" 
+        name="currentGroup"
+        defaultValue={currentGroup} 
+        className="hidden" 
+        hidden
       />
       <button 
         type="submit"

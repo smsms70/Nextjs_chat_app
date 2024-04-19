@@ -6,29 +6,17 @@ import { GoogleLogInButton, GitHubLogInButton } from "@/app/iu/buttons";
 import { DropdownSettings } from "./buttons";
 import { auth } from "@/app/lib/auth";
 import { Modal } from "../helpers";
+import { User } from "firebase/auth";
 
-export default function  UserInfo () {
-  const [user, setUser] = useState(() => auth.currentUser);
+export default function  UserInfo ({user}: {user: User | null}) {
   const [loading, setLoading] = useState<boolean>(true);
 
   const name = (user?.displayName);
   const email = (user?.email);
   const picture = (user?.photoURL);
-
-  useEffect(() => {
-    auth.onAuthStateChanged((user) => {
-      setLoading(false);
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    });
-  }, []);
   
   return (
-    <>{
-    !loading ?
+    <>
     <section className="w-fit min-w-80 px-5 py-2 rounded-3xl flex gap-5 border border-white/40 shadow-lg hover:shadow-white/10 duration-300">
       <span className="w-[55px] overflow-hidden flex rounded-full bg-white">
         <Image 
@@ -61,8 +49,7 @@ export default function  UserInfo () {
 
       { user && <DropdownSettings/> }
 
-    </section> :
-    ''
-    }</>
+    </section>
+    </>
   )
 }
