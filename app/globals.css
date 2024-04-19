@@ -31,3 +31,16 @@ body {
     text-wrap: balance;
   }
 }
+
+#main-chat-section::-webkit-scrollbar {
+  width: 8px;
+}
+#main-chat-section::-webkit-scrollbar-thumb {
+  background-color: #fff5;
+}
+::-webkit-scrollbar {
+  width: 15px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #fff5;
+}
