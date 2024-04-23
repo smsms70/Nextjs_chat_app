@@ -60,9 +60,10 @@ export function DropdownSettings () {
       document.body.removeEventListener("mousedown", HandleClickOutside);
     }
   },[dropdown, dropdownRef])
+  
   return (
     <section className=" ml-auto relative h-8 my-auto">
-      <button className="w-8 text-white/80 hover:text-white hover:rotate-12 hover:scale-105 duration-150 " ref={iconRef}
+      <button className="w-8 text-white/80 hover:text-white hover:rotate-12 duration-150 " ref={iconRef}
       onClick={() => showDropdown(!dropdown)}>
         <SettingsIcon/>
       </button>

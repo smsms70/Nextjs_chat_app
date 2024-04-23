@@ -1,7 +1,7 @@
 "use client"
 
 import { SendIcon } from "@/app/lib/icons";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { useFormState } from "react-dom";
 import { createMessage } from "@/app/lib/actions";
 
@@ -13,9 +13,12 @@ export function SendMessageForm ({currentGroup} :{
 
   const [state, formAction] = useFormState(createMessage, initialState);
 
+  const submitHandler = () => {
+    setNewMessage("");
+  }
   return (
-    <form action={formAction} className="h-24 py-3 w-full mt-auto flex justify-center gap-2 items-center bg-white/10" 
-    onSubmit={() => setNewMessage("")}>
+    <form action={formAction} className="h-20 py-3 px-4 w-full mt-auto flex justify-center gap-2 items-center bg-white/10" 
+    onSubmit={submitHandler}>
       <input 
         type="text" 
         id="message"
@@ -30,7 +33,8 @@ export function SendMessageForm ({currentGroup} :{
         type="text" 
         id="currentGroup" 
         name="currentGroup"
-        defaultValue={currentGroup} 
+        value={currentGroup} 
+        onChange={() => currentGroup}
         className="hidden" 
         hidden
       />

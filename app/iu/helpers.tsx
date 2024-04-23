@@ -1,5 +1,6 @@
 "use client"
 
+import { getDatabase, onValue, ref } from "firebase/database";
 import { useRef, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -55,7 +56,7 @@ export function BlurBackgroundModal ({children, param, className2, func } : {
   useEffect(() => {
     const clickOutHandler = (e: MouseEvent) => {
       if (refProp.current && !refProp.current.contains(e.target as Node) ) {
-        func(false);
+        func;
       }
     } 
     document.addEventListener("mousedown", clickOutHandler);
@@ -71,5 +72,47 @@ export function BlurBackgroundModal ({children, param, className2, func } : {
       {children}
       </section>
     </section>
+  )
+}
+
+
+
+
+
+export function DropDownComponent ({children, icon, iconContainer_Class, func} : {
+  children: JSX.Element;
+  icon: JSX.Element;
+  iconContainer_Class?: string;
+  func?: () => void;
+}) {
+  const [dropdown, showDropdown] = useState<boolean>(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const iconRef = useRef<HTMLButtonElement>(null);
+
+  const HandleClickOutside = (event: MouseEvent) => {
+    if (iconRef.current && !iconRef.current.contains(event.target as Node)) {
+      showDropdown(false);
+      if (func) return func();
+    }
+  } 
+
+  useEffect(() => {
+    document.body.addEventListener("mousedown", HandleClickOutside);
+    
+    return () => {
+      document.body.removeEventListener("mousedown", HandleClickOutside);
+    }
+  },[dropdown, dropdownRef])
+
+  return (
+    <>
+      <button className={iconContainer_Class} ref={iconRef} onClick={() => showDropdown(!dropdown)}>
+        {icon}
+      </button>
+      <div ref={dropdownRef} className="relative">
+        {dropdown && children}
+      </div>
+    </>
   )
 }

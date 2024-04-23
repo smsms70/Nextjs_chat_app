@@ -6,6 +6,7 @@ export async function createMessage (prevState: any, formData: FormData) {
   const data = formData.get("message");
   const group = formData.get("currentGroup");
 
+  console.log(group)
   try {
     sendMessage(data, group);
     // revalidatePath('/');
