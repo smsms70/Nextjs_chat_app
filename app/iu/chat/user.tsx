@@ -1,11 +1,11 @@
 "use client"
 
 import Image from "next/image";
-import { GoogleLogInButton, GitHubLogInButton } from "@/app/iu/buttons";
-import { DropdownSettings } from "./buttons";
-import { Modal } from "../helpers";
+import { GoogleLogInButton, GitHubLogInButton } from "@/app/iu/sign-in-buttons";
+import { DropDownComponent, Modal } from "../helpers";
 import { User } from "firebase/auth";
-import { Loading } from "@/app/lib/icons";
+import { Loading, SettingsIcon } from "@/app/lib/icons";
+import { LogOut } from "@/app/lib/auth";
 
 
 export function  UserInfo ({user, loading}: {
@@ -19,7 +19,7 @@ export function  UserInfo ({user, loading}: {
   
   return (
     <>
-    <section className="w-fit min-w-80 px-5 py-2 rounded-3xl flex gap-5 border border-white/40 shadow-lg hover:shadow-white/10 duration-300">
+    <section className="w-fit min-w-80 px-4 py-2 rounded-3xl flex border border-white/40 shadow-lg hover:shadow-white/10 duration-300">
       {!loading && (
         <span className="size-[45px] rounded-full my-auto bg-white">
           <Image 
@@ -34,14 +34,15 @@ export function  UserInfo ({user, loading}: {
 
       {loading ? <UserSkeleton/> : ( 
         user ? (
-        <section className="content-center ">
+        <section className="content-center mx-4">
           <h3 className="text-lg">{name}</h3>
           <p className="text-white/60 text-sm">{email}</p>
         </section> ) : (
         <section className="flex justify-center ml-auto">
           <Modal
-            Icon={<span className="p-3 mx-auto border border-white/50 hover:bg-white/10 duration-100">Log In</span>}
-            className2="p-10">
+            Icon={<span className="p-3 mx-auto rounded border border-white/50 hover:bg-white/10 duration-100">Log In</span>}
+            className2="p-10"
+          >
             <section className="flex flex-col gap-5">
               <p className="text-xl -mt-4 font-bold text-center">Login</p>
               <GoogleLogInButton/>
@@ -52,7 +53,18 @@ export function  UserInfo ({user, loading}: {
         )
       )}
 
-      { user && !loading && <DropdownSettings/> }
+      { user && !loading && 
+      <DropDownComponent
+        icon={
+          <SettingsIcon className="w-8 text-white/80 hover:text-white hover:rotate-12 duration-150"/>
+        }
+      >
+        <ul className="w-24 absolute bg-zinc-900 top-full right-0 border border-white/50 text-right">
+          <li className="px-3 py-1 text-red-500 cursor-pointer hover:bg-black duration-100" onClick={() => LogOut()}>
+            Log-out
+          </li>
+        </ul>
+      </DropDownComponent> }
 
     </section>
     </>

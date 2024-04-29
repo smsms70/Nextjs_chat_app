@@ -1,13 +1,12 @@
 "use client"
 
 import Image from "next/image";
-import { SendMessageForm } from "./forms";
+import { DeleteMessageForm, SendMessageForm } from "./forms";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { useState, useEffect, useRef } from "react";
 import { User } from "firebase/auth";
 import { Loading, ThreeDots } from "@/app/lib/icons";
 import { DropDownComponent } from "../helpers";
-
 
 export default function ChatBox ({user, currentGroup, loading}: {
   user: User | null;
@@ -16,46 +15,70 @@ export default function ChatBox ({user, currentGroup, loading}: {
 }) {
   const [allMessages, setAllMessages] = useState<any>([]);
   const [chatLoaging, setChatLoading] = useState<boolean>(true);
+  const [messagesId, setMessagesId] = useState<any>([]);
 
   useEffect(() => {
     if (!currentGroup) return setChatLoading(false);
 
     const db = getDatabase();
-    const starCountRef = ref(db, `${currentGroup}/`);
+    const starCountRef = ref(db, `chat/${currentGroup}/`);
     onValue(starCountRef, (snapshot) => {
       const data = snapshot.val();
       let arr = [];
+      let arrId = [];
+
       for (const obj in data) {
-        arr.push({...data[obj], obj})
+        if (obj !== "config") {
+          arr.push({...data[obj], obj});
+          arrId.push(obj);
+        }
       }
       setChatLoading(false);
       setAllMessages(arr);
+      setMessagesId(arrId);
     });
   },[currentGroup]);
 
+  const debuggingHandler = () => {
+    
+  }
 
   return (
-    <section className="rounded-3xl h-dvh md:h-full w-full flex flex-col overflow-hidden border border-white/50 shadow-xl hover:shadow-white/10 duration-300">
+    <section className="rounded-3xl h-dvh md:h-full w-full flex flex-col overflow-hidden border border-white/50 shadow-xl hover:shadow-white/10 duration-300" onClick={debuggingHandler}>
 
       {chatLoaging ? <ChatSkeleton/> : (
         <main className="flex flex-col h-full md:h-[450px] p-1 md:px-3 md:pt-3 overflow-y-scroll "
-        id="main-chat-section">        
-          {currentGroup ? 
-            allMessages.map((e:any, index: number, arr: any) => 
-            (<Message
-              key={Math.random()}
-              message={e.text}
-              sameUser={arr[index - 1]?.userID === e.userID}
-              byThisUser={e.userID === user?.uid}
-              userName={e.name}
-              photo={e.photo}
-              isLast={index === arr.length - 1}
-            />)) : (
+        id="cool-scroll">        
+          {!currentGroup && (
             <section className="py-5 px-4 mx-auto my-auto bg-white/10">
               <p className="text-3xl text-white/70 font-bold">
                 Select a new group to start the chat!
               </p>
             </section>
+          )}
+
+          {(currentGroup && !allMessages[0]) && (
+            <section className="py-2 px-4 mx-auto my-auto bg-white/10">
+              <p className="text-xl text-white/90 font-bold">
+                chat empty 😓 send a new message
+              </p>
+            </section>
+          )}
+
+          {(currentGroup && allMessages[0]) && (
+            allMessages.map((e:any, index: number, arr: any) => 
+              (<Message
+                key={Math.random()}
+                message={e.text}
+                sameUser={arr[index - 1]?.userID === e.userID}
+                byThisUser={e.userID === user?.uid}
+                userName={e.name}
+                photo={e.photo}
+                isLast={index === arr.length - 1}
+                currentGroup={currentGroup}
+                messageId={messagesId[index]}/>
+              )
+            )
           )}
         </main>
       )}
@@ -69,13 +92,15 @@ export default function ChatBox ({user, currentGroup, loading}: {
   )
 }
 
-function Message ({message, byThisUser, sameUser, userName, photo, isLast } :{
+function Message ({message, byThisUser, sameUser, userName, photo, isLast, currentGroup, messageId } :{
   message: string;
   byThisUser: boolean;
   sameUser: boolean;
   userName: string;
   photo: string;
   isLast: boolean;
+  currentGroup: string;
+  messageId: string;
 }) {
   const [visible, setVisible] = useState<boolean>(false);
   const messageBoxRef = useRef<HTMLDivElement>(null);
@@ -83,13 +108,11 @@ function Message ({message, byThisUser, sameUser, userName, photo, isLast } :{
   const closeHandler = () => {
     if (!visible) return;
     setVisible(false);
-    console.log("working");
   }
 
   useEffect(() => {
     if (messageBoxRef.current && isLast) {
       messageBoxRef.current.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-      console.log("scolled");
     }
   },[])
 
@@ -102,7 +125,8 @@ function Message ({message, byThisUser, sameUser, userName, photo, isLast } :{
           sameUser={sameUser}
         />
       }
-      <div className={`max-w-[70%] flex flex-col pb-2 pt-1 px-3 rounded-md text-black relative
+      {/* Body */}
+      <div className={`max-w-[70%] flex flex-col pb-2 pt-1 px-3 rounded-md text-black relative break-words
       ${sameUser ? 'mt-2' : 'mt-4'}
       ${byThisUser ? 
         'ml-auto rounded-tr-none bg-purple-400' : 
@@ -118,7 +142,7 @@ function Message ({message, byThisUser, sameUser, userName, photo, isLast } :{
             {userName}
           </p> 
         }
-          {/* Body */}
+          {/* Text */}
         <p className={ `${byThisUser ? '' : ''}` }>
           {message}
         </p>
@@ -131,16 +155,14 @@ function Message ({message, byThisUser, sameUser, userName, photo, isLast } :{
         <DropDownComponent
         iconContainer_Class="size-5 my-auto"
         icon={<ThreeDots className="fill-white/60 hover:fill-white diration-100"/>}
-        func={closeHandler}
+        // func={closeHandler}
         >
-          <ul className={`w-24 absolute bg-zinc-900 top-5  border border-white/50 text-right z-50 ${!byThisUser ? "left-0" : "right-5"}`} >
-            <li className="px-3 py-1 text-white border-b border-white/50 hover:bg-black duration-100">
-              <button>
-                Rename
-              </button>
-            </li>
-            <li className="px-3 py-1 text-red-500 hover:bg-black  duration-100">
-              Delete
+          <ul className={`absolute bg-zinc-900 top-5 border border-white/50 z-50 ${!byThisUser ? "left-0" : "right-5"}`} >
+            <li>
+              <DeleteMessageForm
+                id={messageId}
+                group={currentGroup}
+              />
             </li>
           </ul>
         </DropDownComponent>

@@ -32,10 +32,11 @@ body {
   }
 }
 
-#main-chat-section::-webkit-scrollbar {
+#cool-scroll::-webkit-scrollbar {
   width: 8px;
 }
-#main-chat-section::-webkit-scrollbar-thumb {
+#cool-scroll::-webkit-scrollbar-thumb {
+  /* visibility: hidden; */
   background-color: #fff5;
 }
 ::-webkit-scrollbar {
