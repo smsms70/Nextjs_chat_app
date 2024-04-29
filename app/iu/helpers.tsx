@@ -1,15 +1,17 @@
 "use client"
 
 import { getDatabase, onValue, ref } from "firebase/database";
-import { useRef, useEffect, useState, forwardRef } from "react";
+import { useRef, useEffect, useState, forwardRef, SetStateAction } from "react";
 import { createPortal } from "react-dom";
 
 
-export const Modal = forwardRef(function Modal({children, Icon, className2, parentIconClassName} : {
+export const Modal = forwardRef(function Modal({children, Icon, className2, parentIconClassName, hideModal, setHideModal} : {
   children: JSX.Element;
   Icon: JSX.Element;
   parentIconClassName?: string;
   className2?: string;
+  hideModal?: boolean;
+  setHideModal?: React.Dispatch<SetStateAction<boolean>>;
 }, ref: any) {
   const [showModal, setShowModal] = useState(false);
   const refProp = useRef<HTMLDivElement>(null);
@@ -33,6 +35,13 @@ export const Modal = forwardRef(function Modal({children, Icon, className2, pare
       document.removeEventListener('mousedown', clickOutHandler);
     };
   }, [refProp, showModal])
+
+  useEffect(() => {
+    if (hideModal) {
+      setShowModal(false);
+      setHideModal!(false);
+    }
+  },[hideModal]);
 
   return (
     <>

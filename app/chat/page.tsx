@@ -30,7 +30,6 @@ export default function Home () {
     if (currentGroup) {
       localStorage.setItem("groupSelected", currentGroup);
     }
-    console.log(currentGroup)
   },[currentGroup])
   
 

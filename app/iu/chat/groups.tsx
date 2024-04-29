@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { getDatabase, ref, onValue } from "firebase/database";
 import Image from "next/image";
 import { SetStateAction } from "react";
-import { Add, EditIcon, Loading, ThreeDots } from "@/app/lib/icons";
-import { DropDownComponent, Modal } from "../helpers";
-import { CrateGroupForm, DeleteGroup, EditGroupForm } from "./forms";
+import { Loading } from "@/app/lib/icons";
+import { CreateGroupsModal, DropdownEditGroupModal } from "./Modals";
 
 
 export default function ChatGroup ({group, setGroup}: {
@@ -50,23 +49,15 @@ export default function ChatGroup ({group, setGroup}: {
     });
   },[]);
   
-  const debuggingHandler = () => {
-    // console.log(groupObject[group])
-  }
   return(
-    <section className="h-full min-w-80 max-h-[400px] rounded-2xl flex flex-col flex-shrink border border-white/40 shadow-xl hover:shadow-white/10 duration-300 overflow-hidden" onClick={debuggingHandler}>
+    <section className="h-full min-w-80 max-h-[400px] rounded-2xl flex flex-col flex-shrink border border-white/40 shadow-xl hover:shadow-white/10 duration-300 overflow-hidden">
       <header className="flex bg-white/10 h-8 px-5 py-1">
         <span className="font-mono">
           Groups
         </span>
-        <Modal
-          Icon={<Add 
-            className="hover:bg-white/10 hover:scale-105 duration-100 rounded-full "/>}
-        >
-          <CrateGroupForm
-            groupsArr={groupBoxes}
-          />
-        </Modal>
+        <CreateGroupsModal
+          groupBoxes={groupBoxes}
+        />
       </header>
 
         {/* Body Handlers */}
@@ -85,7 +76,6 @@ export default function ChatGroup ({group, setGroup}: {
               picture={box.image}
               isActive={box.name === group}
               setGroup={setGroup}
-              groupBoxes={groupBoxes}
               groupObject={groupObject[group]}
             />
           ))} 
@@ -96,21 +86,16 @@ export default function ChatGroup ({group, setGroup}: {
   )
 }
 
-function Group ({name, picture, isActive, setGroup, groupBoxes, groupObject}: {
+function Group ({name, picture, isActive, setGroup, groupObject}: {
   name: string;
   picture: string;
   isActive: boolean;
   setGroup: React.Dispatch<SetStateAction<string>>; 
-  groupBoxes: any[];
   groupObject: any;
 }) {
-  const dropDownRef = useRef<HTMLDivElement>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  const selectGroupHandler = (event: React.MouseEvent<HTMLElement>) => {
-    if (dropDownRef.current && !dropDownRef.current.contains(event.target as Node)) {
-      setGroup(name);
-    }
+  
+  const selectGroupHandler = () => {
+    setGroup(name);
   }
 
   return (
@@ -134,40 +119,12 @@ function Group ({name, picture, isActive, setGroup, groupBoxes, groupObject}: {
         </div>
       }
 
-      <section className="my-auto flex" ref={dropDownRef}>
-        <DropDownComponent
-          iconContainer_Class="size-5 my-auto"
-          icon={<ThreeDots className="fill-white/60 hover:fill-white diration-100 "/>}
-          ref={modalRef}
-        >
-        <ul className="absolute bg-zinc-900 top-5 right-0 border border-white/50 text-right" >
-          <li className="border-b border-white/50 hover:bg-black duration-100">
-            <Modal
-              Icon={
-                <>
-                  <EditIcon/>
-                  <span className="block w-full px-2 py-1">
-                    Edit
-                  </span>
-                </>
-              }
-              parentIconClassName="w-full px-1 flex text-white/80 hover:text-white duration-200"
-              ref={modalRef}
-            >
-              <EditGroupForm
-                currentName={name}
-                groupObject={groupObject}
-              />
-            </Modal>
-          </li>
-          <li className="hover:bg-black  duration-100">
-            <DeleteGroup
-              group={name}
-              setGroup={setGroup}
-            />
-          </li>
-        </ul>
-        </DropDownComponent>
+      <section className="my-auto flex">
+        <DropdownEditGroupModal
+          name={name}
+          groupObject={groupObject}
+          setGroup={setGroup}
+        />
       </section>
     </div>
   )
@@ -189,19 +146,15 @@ function GroupSkeleton () {
 function GroupEmptyCase ({groupBoxes} : {
   groupBoxes: any[]
 }) {
+
   return (
     <section className="flex py-5 px-4 mx-2 mt-5 bg-white/10 hover:bg-white/15 duration-100">
       <p className="text-2xl text-white/80 font-bold cursor-default">
         Click to add new group! 
       </p>
-      <Modal
-        Icon={<Add 
-          className="hover:bg-white/10 hover:scale-105 duration-100 rounded-full "/>}
-      >
-        <CrateGroupForm
-          groupsArr={groupBoxes}
-        />
-      </Modal>
+      <CreateGroupsModal
+        groupBoxes={groupBoxes}
+      />
     </section>
   )
 }

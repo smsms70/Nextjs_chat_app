@@ -1,12 +1,11 @@
 "use client"
 
 import Image from "next/image";
-import { GoogleLogInButton, GitHubLogInButton } from "@/app/iu/sign-in-buttons";
-import { DropDownComponent, Modal } from "../helpers";
+import { DropDownComponent } from "../helpers";
 import { User } from "firebase/auth";
 import { Loading, SettingsIcon } from "@/app/lib/icons";
 import { LogOut } from "@/app/lib/auth";
-
+import { UserLoginModal } from "./Modals";
 
 export function  UserInfo ({user, loading}: {
   user: User | null;
@@ -39,16 +38,7 @@ export function  UserInfo ({user, loading}: {
           <p className="text-white/60 text-sm">{email}</p>
         </section> ) : (
         <section className="flex justify-center ml-auto">
-          <Modal
-            Icon={<span className="p-3 mx-auto rounded border border-white/50 hover:bg-white/10 duration-100">Log In</span>}
-            className2="p-10"
-          >
-            <section className="flex flex-col gap-5">
-              <p className="text-xl -mt-4 font-bold text-center">Login</p>
-              <GoogleLogInButton/>
-              <GitHubLogInButton/>
-            </section>
-          </Modal>
+          <UserLoginModal/>
         </section>
         )
       )}

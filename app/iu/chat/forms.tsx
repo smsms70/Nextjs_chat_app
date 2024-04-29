@@ -63,8 +63,9 @@ export function SendMessageForm ({currentGroup} :{
 
 
 
-export function CrateGroupForm ({groupsArr} : {
+export function CreateGroupForm ({groupsArr, setHideModal} : {
   groupsArr: any[];
+  setHideModal: React.Dispatch<SetStateAction<boolean>>
 }) {
 
   const initialState = {message: ""}
@@ -78,7 +79,7 @@ export function CrateGroupForm ({groupsArr} : {
   }
   return (
     <form action={(groupsArr.some((e) => e.name === name) || groupsArr.length > 10) ? actionHandler : formAction}
-    className="w-96 flex flex-col absolute bg-zinc-900 rounded-md top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 shadow-xl shadow-white/10 border border-white/30">
+    className="w-96 flex flex-col absolute bg-zinc-900 rounded-md top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 shadow-xl shadow-white/10 border border-white/30" onSubmit={() => setHideModal(true)}>
       <h3 className="mt-2 mx-auto font-bold text-xl">
         Create new group
       </h3>

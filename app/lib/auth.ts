@@ -24,7 +24,7 @@ export function GoogleSignIn () {
 export function GitHubSignIn () {
   signInWithPopup(auth, githubProvider)
   .then((result) => {
-    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const credential = GithubAuthProvider.credentialFromResult(result);
     const user = result.user;
 
   }).catch((error) => {

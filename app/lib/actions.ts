@@ -22,7 +22,7 @@ export async function createGroup (prevState: any, formData: FormData) {
 
   try {
     setGroup(data);
-    // revalidatePath('/');
+    revalidatePath('/');
     return {message: "message Sended"}
   } catch (err) {
 
